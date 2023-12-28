@@ -1,0 +1,9 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+  form(action="/submit-data", method="POST")
+    label(for="inputText") Enter Text:
+    input(type="application/json", id="inputText", name="text")
+    button(type="submit") Submit

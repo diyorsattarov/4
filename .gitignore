@@ -1,0 +1,22 @@
+# General ignore rules for the entire repo
+node_modules/
+*.log
+*.env
+.DS_Store
+
+# Express-service specific rules
+express-service/node_modules/
+express-service/build/
+express-service/logs/
+express-service/*.log
+
+# React-service specific rules
+react-service/node_modules/
+react-service/build/
+react-service/.env.local
+react-service/.env.development.local
+react-service/.env.test.local
+react-service/.env.production.local
+react-service/npm-debug.log*
+
+# Other ignore rules as needed
