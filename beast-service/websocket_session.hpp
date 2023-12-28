@@ -4,7 +4,7 @@
 #include "net.hpp"
 #include "beast.hpp"
 #include "shared_state.hpp"
-
+#include <unordered_map>
 #include <cstdlib>
 #include <memory>
 #include <string>
@@ -26,7 +26,7 @@ class websocket_session : public boost::enable_shared_from_this<websocket_sessio
     void on_accept(beast::error_code ec);
     void on_read(beast::error_code ec, std::size_t bytes_transferred);
     void on_write(beast::error_code ec, std::size_t bytes_transferred);
-
+    void initialize_product_data();
 public:
     websocket_session(
         tcp::socket&& socket,
@@ -43,6 +43,7 @@ public:
     send(boost::shared_ptr<std::string const> const& ss);
 
 private:
+    std::unordered_map<std::string, std::string> product_data;
     void
     on_send(boost::shared_ptr<std::string const> const& ss);
 };

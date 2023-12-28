@@ -1,15 +1,14 @@
 #include "websocket_session.hpp"
 #include "json.hpp"
 #include <iostream>
-#include <unordered_map>
 
-websocket_session::
-websocket_session(
+websocket_session::websocket_session(
     tcp::socket&& socket,
     boost::shared_ptr<shared_state> const& state)
     : ws_(std::move(socket))
     , state_(state)
 {
+    initialize_product_data();
 }
 
 websocket_session::
@@ -17,6 +16,23 @@ websocket_session::
 {
     // Remove this session from the list of active sessions
     state_->leave(this);
+}
+
+void websocket_session::initialize_product_data()
+{
+    // Populate the product_data map
+    product_data = {
+        {"1", "{\"product_id\": 1, \"name\": \"Product One\", \"description\": \"Description of Product One\"}"},
+        {"2", "{\"product_id\": 2, \"name\": \"Product Two\", \"description\": \"Description of Product Two\"}"},
+        {"3", "{\"product_id\": 3, \"name\": \"Product Three\", \"description\": \"Description of Product Three\"}"},
+        {"4", "{\"product_id\": 4, \"name\": \"Product Four\", \"description\": \"Description of Product Four\"}"},
+        {"5", "{\"product_id\": 5, \"name\": \"Product Five\", \"description\": \"Description of Product Five\"}"},
+        {"6", "{\"product_id\": 6, \"name\": \"Product Six\", \"description\": \"Description of Product Six\"}"},
+        {"7", "{\"product_id\": 7, \"name\": \"Product Seven\", \"description\": \"Description of Product Seven\"}"},
+        {"8", "{\"product_id\": 8, \"name\": \"Product Eight\", \"description\": \"Description of Product Eight\"}"},
+        {"9", "{\"product_id\": 9, \"name\": \"Product Nine\", \"description\": \"Description of Product Nine\"}"},
+        {"10", "{\"product_id\": 10, \"name\": \"Product Ten\", \"description\": \"Description of Product Ten\"}"}
+    };
 }
 
 void
@@ -70,34 +86,27 @@ void websocket_session::on_read(beast::error_code ec, std::size_t bytes_transfer
     try
     {
         nlohmann::json json_msg = nlohmann::json::parse(received_msg);
-
-        // Check if the JSON message contains a "method" key
+        
         if (json_msg.contains("method"))
         {
             std::string method = json_msg["method"];
 
-            if (method == "create_product")
+            if (method == "get_all_products")
             {
-                // Handle create_product method (add a product to the unordered_map)
-                // Implement this logic later
-                std::string response_msg = "Create Product method is not implemented yet.";
-                state_->send(response_msg);
-                std::cout << "Sent response for create_product method." << std::endl;
+                // Convert the entire unordered_map to a JSON array and send
+                nlohmann::json products_json = nlohmann::json::array();
+                for (const auto& pair : product_data) {
+                    products_json.push_back(nlohmann::json::parse(pair.second));
+                }
+                state_->send(products_json.dump());
+                std::cout << "Sent response with all products." << std::endl;
             }
             else if (method == "get_product")
             {
-                // Handle get_product method (get a product using associated ID)
                 if (json_msg.contains("product_id"))
                 {
                     std::string product_id = json_msg["product_id"];
-                    
-                    // Define product data
-                    std::unordered_map<std::string, std::string> product_data = {
-                        {"1", "{\"product_id\": 1, \"name\": \"Product One\", \"description\": \"Description of Product One\"}"},
-                        {"2", "{\"product_id\": 2, \"name\": \"Product Two\", \"description\": \"Description of Product Two\"}"}
-                    };
 
-                    // Check if the product ID exists in the map
                     if (product_data.find(product_id) != product_data.end())
                     {
                         state_->send(product_data[product_id]);
