@@ -111,6 +111,8 @@ void websocket_session::on_read(beast::error_code ec, std::size_t bytes_transfer
                 handle_get_product(json_msg);
             } else if (method == "login") {
                 handle_login(json_msg);
+            } else if (method == "validate_cookie") {
+                handle_validate_cookie(json_msg);
             } else {
                 std::string error_msg = "ERROR: Invalid method";
                 state_->send(error_msg);
@@ -213,10 +215,13 @@ void websocket_session::handle_login(const nlohmann::json& json_msg) {
         // User exists and password matches
         set_user_token(user_it->second); // This sets both token and expiry
 
+        // Add the user's info to the session map
+        user_sessions[username] = user_it->second;
+
         nlohmann::json response = {
             {"status", "success"},
             {"message", "Login successful"},
-            {"token", user_it->second.cookie} // Send the token as part of the response
+            {"cookie", user_it->second.cookie} // Send the token as part of the response
         };
         state_->send(response.dump());
     } else {
@@ -227,4 +232,38 @@ void websocket_session::handle_login(const nlohmann::json& json_msg) {
         };
         state_->send(response.dump());
     }
+}
+
+void websocket_session::handle_validate_cookie(const nlohmann::json& json_msg) {
+    std::string username = json_msg.value("username", "");
+    std::string cookie = json_msg.value("cookie", "");
+
+    std::cout << "Validating cookie for username: " << username << std::endl;
+
+    auto session_it = user_sessions.find(username);
+    if (session_it != user_sessions.end()) {
+        const UserInfo& user_info = session_it->second;
+        std::cout << "User found in session. Validating cookie..." << std::endl;
+
+        if (user_info.cookie == cookie && !is_token_expired(user_info)) {
+            std::cout << "Cookie validation successful." << std::endl;
+            nlohmann::json response = {
+                {"status", "success"},
+                {"message", "Cookie validation successful"}
+            };
+            state_->send(response.dump());
+            return;
+        } else {
+            std::cout << "Cookie validation failed: Invalid cookie or cookie expired." << std::endl;
+        }
+    } else {
+        std::cout << "User not found in session." << std::endl;
+    }
+
+    // Return an error response if validation fails
+    nlohmann::json response = {
+        {"status", "error"},
+        {"message", "Invalid cookie or cookie expired"}
+    };
+    state_->send(response.dump());
 }

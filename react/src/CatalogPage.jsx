@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 
-const staticImageUrl = 'product.png';
 
 function Catalog() {
   const [products, setProducts] = useState([]);

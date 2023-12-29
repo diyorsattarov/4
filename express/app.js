@@ -35,18 +35,21 @@ app.post('/submit-data', async (req, res) => {
         const responseData = JSON.parse(response);
         res.status(200).json(responseData);
       });
-    }
-    // Check if the method is 'get_all_products'
-    else if (jsonData.method === "get_all_products") {
+    } else if (jsonData.method === "get_all_products") {
       ws.send(JSON.stringify(jsonData));
 
       ws.once('message', (response) => {
         const responseData = JSON.parse(response);
         res.status(200).json(responseData);
       });
-    }
-    // Check if the method is 'login'
-    else if (jsonData.method === "login") {
+    } else if (jsonData.method === "login") {
+      ws.send(JSON.stringify(jsonData));
+
+      ws.once('message', (response) => {
+        const responseData = JSON.parse(response);
+        res.status(200).json(responseData);
+      });
+    } else if (jsonData.method === "validate_cookie") {
       ws.send(JSON.stringify(jsonData));
 
       ws.once('message', (response) => {
@@ -60,22 +63,6 @@ app.post('/submit-data', async (req, res) => {
   } catch (error) {
     console.error('Error:', error);
     res.status(500).send('Internal Server Error');
-  }
-});
-
-
-app.post('/login-data', (req, res) => {
-  const { username, password } = req.body;
-
-  // Implement your login logic here.
-  // For this example, we'll just log the credentials and send a response.
-  console.log('Login Attempt:', username, password);
-  
-  // Dummy validation - in a real application, you should check the credentials against a database or another service
-  if (username === 'correctUsername' && password === 'correctPassword') {
-    res.json({ message: 'Login successful' });
-  } else {
-    res.status(401).json({ message: 'Invalid credentials' });
   }
 });
 
