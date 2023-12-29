@@ -1,6 +1,36 @@
 #include "websocket_session.hpp"
 #include <iostream>
 
+
+// Generate a random token
+std::string generate_token() {
+    static const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+    std::string token;
+    std::random_device rd;
+    std::mt19937 generator(rd());
+
+    for (int i = 0; i < 32; ++i) {
+        token += alphanum[generator() % (sizeof(alphanum) - 1)];
+    }
+
+    return token;
+}
+
+// Set token with expiry
+void set_user_token(UserInfo& user, int hours_until_expiry = 24) {
+    user.cookie = generate_token(); // Use the correct field name 'cookie'
+    user.token_expiry = std::chrono::system_clock::now() + std::chrono::hours(hours_until_expiry);
+}
+
+
+// Check if token is expired
+bool is_token_expired(const UserInfo& user) {
+    return std::chrono::system_clock::now() > user.token_expiry;
+}
+
 // Constructor
 websocket_session::websocket_session(tcp::socket&& socket, boost::shared_ptr<shared_state> const& state)
     : ws_(std::move(socket)), state_(state) {
@@ -17,7 +47,11 @@ websocket_session::~websocket_session() {
 void websocket_session::initialize_product_data() {
     for (int i = 1; i <= 25; ++i) {
         std::string id = std::to_string(i);
-        std::string product_json = "{\"product_id\": " + id + ", \"name\": \"Product " + id + "\", \"description\": \"Description of Product " + id + "\"}";
+        std::string product_json = 
+		"{\"product_id\": " + id + 
+		", \"name\": \"Product " + id + 
+		"\", \"description\": \"Description of Product " + id + 
+		"\"}";
         product_data[id] = product_json;
     }
 
@@ -174,21 +208,15 @@ void websocket_session::handle_login(const nlohmann::json& json_msg) {
     std::string username = json_msg.value("username", "");
     std::string password = json_msg.value("password", "");
 
-    // Check if user exists and password matches
     auto user_it = user_data.find(username);
     if (user_it != user_data.end() && user_it->second.password == password) {
         // User exists and password matches
+        set_user_token(user_it->second); // This sets both token and expiry
 
-        // Generate or retrieve a cookie/session token (if necessary)
-        // For demonstration, I'm using a placeholder token
-        std::string session_token = "some_generated_token"; 
-        user_it->second.cookie = session_token; // Update the user's session token
-
-        // Send a success message with the session token
         nlohmann::json response = {
             {"status", "success"},
             {"message", "Login successful"},
-            {"cookie", session_token}
+            {"token", user_it->second.cookie} // Send the token as part of the response
         };
         state_->send(response.dump());
     } else {

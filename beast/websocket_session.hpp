@@ -9,10 +9,13 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include <random>
+#include <chrono>
 
 struct UserInfo {
     std::string password;
     std::string cookie; // or session token
+    std::chrono::time_point<std::chrono::system_clock> token_expiry;
 };
 
 // Forward declaration
