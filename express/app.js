@@ -5,7 +5,13 @@ const path = require('path');
 const WebSocket = require('ws');
 const app = express();
 const server = http.createServer(app);
-app.use(cors());
+const corsOptions = {
+  origin: 'http://localhost:5174', // Set to the specific origin
+  credentials: true, // Allow credentials (cookies, etc.)
+  optionsSuccessStatus: 200 // For legacy browser support
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
@@ -40,7 +46,6 @@ app.post('/submit-data', async (req, res) => {
 
       ws.once('message', (response) => {
         const responseData = JSON.parse(response);
-        //console.log(`beast-service responseData: ${JSON.stringify(responseData)}`);
         res.status(200).json(responseData);
       });
     }
@@ -50,7 +55,15 @@ app.post('/submit-data', async (req, res) => {
 
       ws.once('message', (response) => {
         const responseData = JSON.parse(response);
-        //console.log(`beast-service responseData: ${JSON.stringify(responseData)}`);
+        res.status(200).json(responseData);
+      });
+    }
+    // Check if the method is 'login'
+    else if (jsonData.method === "login") {
+      ws.send(JSON.stringify(jsonData));
+
+      ws.once('message', (response) => {
+        const responseData = JSON.parse(response);
         res.status(200).json(responseData);
       });
     } else {
@@ -62,6 +75,7 @@ app.post('/submit-data', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 app.post('/login-data', (req, res) => {
   const { username, password } = req.body;

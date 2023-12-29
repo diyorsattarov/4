@@ -29,6 +29,18 @@ void websocket_session::initialize_user_data() {
     user_data["admin"] = "password";
     user_data["user"] = "password";
     // Update the total number of users
+    // need to implement cookie logic
+    // could use a struct 
+    /*
+        struct UserInfo {
+            std::string password;
+            std::string cookie; // or session token
+        };
+        std::unordered_map<std::string, UserInfo> user_data;
+    then ->
+        user_data["username"] = UserInfo{"password", "cookie_or_token"};
+    but need to impleemnt the null cookie situation? Or empty cookie 
+    */
 }
 
 // Handle failure
@@ -65,8 +77,7 @@ void websocket_session::on_read(beast::error_code ec, std::size_t bytes_transfer
                 handle_get_product(json_msg);
             } else if (method == "login") {
                 handle_login(json_msg);
-            } 
-            else {
+            } else {
                 std::string error_msg = "ERROR: Invalid method";
                 state_->send(error_msg);
                 std::cout << "Sent error response for invalid method." << std::endl;

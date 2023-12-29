@@ -9,16 +9,18 @@ function TestPage() {
 
     // Construct the payload
     const loginData = {
+      method: "login",
       username: username,
       password: password
     };
 
     // Send data to your Express service
-    fetch('http://localhost:5000/login-data', {
+    fetch('http://localhost:5000/submit-data', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
+      credentials: 'include', // Include cookies with the request
       body: JSON.stringify(loginData)
     })
     .then(response => response.json())
