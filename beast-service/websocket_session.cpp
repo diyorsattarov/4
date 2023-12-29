@@ -98,13 +98,30 @@ void websocket_session::on_write(beast::error_code ec, std::size_t) {
 
 // Handle get_all_products method
 void websocket_session::handle_get_all_products(const nlohmann::json& json_msg) {
+    // Extract pagination parameters from json_msg
+    int page = json_msg.value("page", 1); // Default to page 1 if not specified
+    int limit = json_msg.value("limit", 10); // Default to 10 items per page if not specified
+
+    // Calculate the starting index and the ending index for the requested page
+    int start_index = (page - 1) * limit;
+    int end_index = start_index + limit;
+
+    // Create a JSON array to hold the products for the requested page
     nlohmann::json products_json = nlohmann::json::array();
-    for (const auto& pair : product_data) {
-        products_json.push_back(nlohmann::json::parse(pair.second));
+
+    // Add products to the JSON array based on the calculated indices
+    for (int i = start_index; i < end_index && i < product_data.size(); ++i) {
+        std::string id = std::to_string(i + 1); // +1 because product IDs start from 1
+        if (product_data.find(id) != product_data.end()) {
+            products_json.push_back(nlohmann::json::parse(product_data[id]));
+        }
     }
+
+    // Send the paginated list of products
     state_->send(products_json.dump());
-    std::cout << "Sent response with all products." << std::endl;
+    std::cout << "Sent response with products for page " << page << std::endl;
 }
+
 
 // Handle get_product method
 void websocket_session::handle_get_product(const nlohmann::json& json_msg) {

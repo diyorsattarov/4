@@ -104,22 +104,22 @@ app.get('/get_product', async (req, res) => {
 
 app.get('/get_all_products', async (req, res) => {
   try {
-    // Create a JSON object for the 'get_all_products' method
-    const jsonData = { method: 'get_all_products' };
+    // Extract the page number from query parameters
+    const page = parseInt(req.query.page) || 1; // Default to page 1 if not specified
 
-    // Log the JSON data
-    console.log('Sending JSON data:', jsonData);
+    // Create a JSON object for the 'get_all_products' method
+    const jsonData = { 
+      method: 'get_all_products',
+      page: page,
+      limit: 10  // Limit is always 10
+    };
 
     // Send the JSON request as a WebSocket message to 'ws://beast:8080/'
     ws.send(JSON.stringify(jsonData));
 
     // Listen for a response from the WebSocket server
     ws.once('message', (response) => {
-      // Parse the response from the WebSocket server
       const responseData = JSON.parse(response);
-      //console.log(`beast-service responseData: ${JSON.stringify(responseData)}`);
-
-      // Send the response from the WebSocket server as the HTTP response
       res.status(200).json(responseData);
     });
   } catch (error) {
@@ -127,6 +127,7 @@ app.get('/get_all_products', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
 
 
 const PORT = process.env.PORT || 5000;
