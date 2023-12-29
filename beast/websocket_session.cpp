@@ -29,6 +29,18 @@ void websocket_session::initialize_user_data() {
     user_data["admin"] = "password";
     user_data["user"] = "password";
     // Update the total number of users
+    // need to implement cookie logic
+    // could use a struct 
+    /*
+        struct UserInfo {
+            std::string password;
+            std::string cookie; // or session token
+        };
+        std::unordered_map<std::string, UserInfo> user_data;
+    then ->
+        user_data["username"] = UserInfo{"password", "cookie_or_token"};
+    but need to impleemnt the null cookie situation? Or empty cookie 
+    */
 }
 
 // Handle failure
