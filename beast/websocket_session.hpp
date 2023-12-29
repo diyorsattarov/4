@@ -10,6 +10,11 @@
 #include <string>
 #include <vector>
 
+struct UserInfo {
+    std::string password;
+    std::string cookie; // or session token
+};
+
 // Forward declaration
 class shared_state;
 
@@ -45,7 +50,7 @@ public:
 
 private:
     std::unordered_map<std::string, std::string> product_data;
-    std::unordered_map<std::string, std::string> user_data;
+    std::unordered_map<std::string, UserInfo> user_data;
     std::size_t totalProducts;
     void
     on_send(boost::shared_ptr<std::string const> const& ss);

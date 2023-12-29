@@ -26,8 +26,8 @@ void websocket_session::initialize_product_data() {
 }
 
 void websocket_session::initialize_user_data() {
-    user_data["admin"] = "password";
-    user_data["user"] = "password";
+    user_data["admin"] = UserInfo{"password", "initalize_token"};
+    user_data["user"] = UserInfo{"password", "initalize_token"};
     // Update the total number of users
     // need to implement cookie logic
     // could use a struct 
@@ -176,15 +176,27 @@ void websocket_session::handle_login(const nlohmann::json& json_msg) {
 
     // Check if user exists and password matches
     auto user_it = user_data.find(username);
-    bool is_valid = (user_it != user_data.end() && user_it->second == password);
+    if (user_it != user_data.end() && user_it->second.password == password) {
+        // User exists and password matches
 
-    if (is_valid) {
-        // Send a success message
-        nlohmann::json response = {{"status", "success"}, {"message", "Login successful"}};
+        // Generate or retrieve a cookie/session token (if necessary)
+        // For demonstration, I'm using a placeholder token
+        std::string session_token = "some_generated_token"; 
+        user_it->second.cookie = session_token; // Update the user's session token
+
+        // Send a success message with the session token
+        nlohmann::json response = {
+            {"status", "success"},
+            {"message", "Login successful"},
+            {"cookie", session_token}
+        };
         state_->send(response.dump());
     } else {
-        // Send an error message
-        nlohmann::json response = {{"status", "error"}, {"message", "Invalid username or password"}};
+        // User does not exist or password does not match
+        nlohmann::json response = {
+            {"status", "error"},
+            {"message", "Invalid username or password"}
+        };
         state_->send(response.dump());
     }
 }
