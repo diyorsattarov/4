@@ -2,7 +2,6 @@
 import React from 'react';
 import useSession from '../hooks/session';
 import useCatalog from '../hooks/catalog';
-import NavBar from '../components/NavBar';
 import LoginForm from '../components/LoginForm';
 import './Catalog.css'; // Import the CSS file
 
@@ -16,7 +15,6 @@ function Catalog() {
         <LoginForm onLogin={handleLogin} />
       ) : (
         <div className="catalog-container">
-          <NavBar />
           <h1>Product Catalog</h1>
           {products.map((product) => (
             <div key={product.product_id} className="product-card">
