@@ -21,19 +21,15 @@ websocket_session::
 void websocket_session::initialize_product_data()
 {
     // Populate the product_data map
-    product_data = {
-        {"1", "{\"product_id\": 1, \"name\": \"Product One\", \"description\": \"Description of Product One\"}"},
-        {"2", "{\"product_id\": 2, \"name\": \"Product Two\", \"description\": \"Description of Product Two\"}"},
-        {"3", "{\"product_id\": 3, \"name\": \"Product Three\", \"description\": \"Description of Product Three\"}"},
-        {"4", "{\"product_id\": 4, \"name\": \"Product Four\", \"description\": \"Description of Product Four\"}"},
-        {"5", "{\"product_id\": 5, \"name\": \"Product Five\", \"description\": \"Description of Product Five\"}"},
-        {"6", "{\"product_id\": 6, \"name\": \"Product Six\", \"description\": \"Description of Product Six\"}"},
-        {"7", "{\"product_id\": 7, \"name\": \"Product Seven\", \"description\": \"Description of Product Seven\"}"},
-        {"8", "{\"product_id\": 8, \"name\": \"Product Eight\", \"description\": \"Description of Product Eight\"}"},
-        {"9", "{\"product_id\": 9, \"name\": \"Product Nine\", \"description\": \"Description of Product Nine\"}"},
-        {"10", "{\"product_id\": 10, \"name\": \"Product Ten\", \"description\": \"Description of Product Ten\"}"}
-    };
+    for (int i = 1; i <= 75; ++i) {
+        std::string id = std::to_string(i);
+        std::string product_json = "{\"product_id\": " + id + 
+                                   ", \"name\": \"Product " + id + 
+                                   "\", \"description\": \"Description of Product " + id + "\"}";
+        product_data[id] = product_json;
+    }
 }
+
 
 void
 websocket_session::
