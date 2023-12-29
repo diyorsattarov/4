@@ -1,5 +1,5 @@
 // auth.js
-export async function validateCookie(username, cookie) {
+export async function useCookie(username, cookie) {
   try {
     const response = await fetch('http://localhost:5000/submit-data', {  // Make sure the URL is correct
       method: 'POST',
