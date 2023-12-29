@@ -5,7 +5,7 @@ import useCatalog from '../hooks/catalog';
 import LoginForm from '../components/LoginForm';
 import './Catalog.css'; // Import the CSS file
 
-function Catalog() {
+function Catalog({ addToCart }) { // Receive addToCart as a prop
   const { isLoggedIn, handleLogin } = useSession();
   const { products, currentPage, totalPages, handleNextPage, handlePreviousPage } = useCatalog();
 
@@ -22,6 +22,7 @@ function Catalog() {
               <h2>{product.name}</h2>
               <p><strong>ID:</strong> {product.product_id}</p>
               <p><strong>Description:</strong> {product.description}</p>
+              <button onClick={() => addToCart(product)}>Add to Cart</button>
             </div>
           ))}
           <div className="pagination">

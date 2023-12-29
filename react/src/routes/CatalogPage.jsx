@@ -1,11 +1,12 @@
 // CatalogPage.js
 import React from 'react';
-import Catalog from '../components/Catalog'; // Adjust the import path as necessary
+import Catalog from '../components/Catalog';
+// ... other imports
 
-function CatalogPage() {
+function CatalogPage({ addToCart }) {
   return (
     <div>
-      <Catalog /> {/* Render the Catalog component */}
+      <Catalog addToCart={addToCart} />
     </div>
   );
 }
