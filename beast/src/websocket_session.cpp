@@ -1,5 +1,35 @@
-#include "websocket_session.hpp"
+#include "../include/websocket_session.hpp"
 #include <iostream>
+
+
+// Generate a random token
+std::string generate_token() {
+    static const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+    std::string token;
+    std::random_device rd;
+    std::mt19937 generator(rd());
+
+    for (int i = 0; i < 32; ++i) {
+        token += alphanum[generator() % (sizeof(alphanum) - 1)];
+    }
+
+    return token;
+}
+
+// Set token with expiry
+void set_user_token(UserInfo& user, int hours_until_expiry = 24) {
+    user.cookie = generate_token(); // Use the correct field name 'cookie'
+    user.token_expiry = std::chrono::system_clock::now() + std::chrono::hours(hours_until_expiry);
+}
+
+
+// Check if token is expired
+bool is_token_expired(const UserInfo& user) {
+    return std::chrono::system_clock::now() > user.token_expiry;
+}
 
 // Constructor
 websocket_session::websocket_session(tcp::socket&& socket, boost::shared_ptr<shared_state> const& state)
@@ -17,7 +47,11 @@ websocket_session::~websocket_session() {
 void websocket_session::initialize_product_data() {
     for (int i = 1; i <= 25; ++i) {
         std::string id = std::to_string(i);
-        std::string product_json = "{\"product_id\": " + id + ", \"name\": \"Product " + id + "\", \"description\": \"Description of Product " + id + "\"}";
+        std::string product_json = 
+		"{\"product_id\": " + id + 
+		", \"name\": \"Product " + id + 
+		"\", \"description\": \"Description of Product " + id + 
+		"\"}";
         product_data[id] = product_json;
     }
 
@@ -26,8 +60,8 @@ void websocket_session::initialize_product_data() {
 }
 
 void websocket_session::initialize_user_data() {
-    user_data["admin"] = "password";
-    user_data["user"] = "password";
+    user_data["admin"] = UserInfo{"password", "initalize_token"};
+    user_data["user"] = UserInfo{"password", "initalize_token"};
     // Update the total number of users
     // need to implement cookie logic
     // could use a struct 
@@ -77,6 +111,8 @@ void websocket_session::on_read(beast::error_code ec, std::size_t bytes_transfer
                 handle_get_product(json_msg);
             } else if (method == "login") {
                 handle_login(json_msg);
+            } else if (method == "validate_cookie") {
+                handle_validate_cookie(json_msg);
             } else {
                 std::string error_msg = "ERROR: Invalid method";
                 state_->send(error_msg);
@@ -174,17 +210,60 @@ void websocket_session::handle_login(const nlohmann::json& json_msg) {
     std::string username = json_msg.value("username", "");
     std::string password = json_msg.value("password", "");
 
-    // Check if user exists and password matches
     auto user_it = user_data.find(username);
-    bool is_valid = (user_it != user_data.end() && user_it->second == password);
+    if (user_it != user_data.end() && user_it->second.password == password) {
+        // User exists and password matches
+        set_user_token(user_it->second); // This sets both token and expiry
 
-    if (is_valid) {
-        // Send a success message
-        nlohmann::json response = {{"status", "success"}, {"message", "Login successful"}};
+        // Add the user's info to the session map
+        user_sessions[username] = user_it->second;
+
+        nlohmann::json response = {
+            {"status", "success"},
+            {"message", "Login successful"},
+            {"cookie", user_it->second.cookie} // Send the token as part of the response
+        };
         state_->send(response.dump());
     } else {
-        // Send an error message
-        nlohmann::json response = {{"status", "error"}, {"message", "Invalid username or password"}};
+        // User does not exist or password does not match
+        nlohmann::json response = {
+            {"status", "error"},
+            {"message", "Invalid username or password"}
+        };
         state_->send(response.dump());
     }
+}
+
+void websocket_session::handle_validate_cookie(const nlohmann::json& json_msg) {
+    std::string username = json_msg.value("username", "");
+    std::string cookie = json_msg.value("cookie", "");
+
+    std::cout << "Validating cookie for username: " << username << std::endl;
+
+    auto session_it = user_sessions.find(username);
+    if (session_it != user_sessions.end()) {
+        const UserInfo& user_info = session_it->second;
+        std::cout << "User found in session. Validating cookie..." << std::endl;
+
+        if (user_info.cookie == cookie && !is_token_expired(user_info)) {
+            std::cout << "Cookie validation successful." << std::endl;
+            nlohmann::json response = {
+                {"status", "success"},
+                {"message", "Cookie validation successful"}
+            };
+            state_->send(response.dump());
+            return;
+        } else {
+            std::cout << "Cookie validation failed: Invalid cookie or cookie expired." << std::endl;
+        }
+    } else {
+        std::cout << "User not found in session." << std::endl;
+    }
+
+    // Return an error response if validation fails
+    nlohmann::json response = {
+        {"status", "error"},
+        {"message", "Invalid cookie or cookie expired"}
+    };
+    state_->send(response.dump());
 }
