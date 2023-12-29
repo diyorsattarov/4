@@ -2,25 +2,22 @@ import React, { useState, useEffect } from 'react';
 
 function Catalog() {
   const [products, setProducts] = useState([]);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const productsPerPage = 10; // Fixed number of products per page
   
   useEffect(() => {
     fetch(`http://localhost:5000/get_all_products?page=${currentPage}`)
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to fetch products');
-        }
-        return response.json();
-      })
+      .then(response => response.json())
       .then(data => {
-        console.log('Received products:', data);
-        setProducts(data);
+        setProducts(data.products);
+        setTotalProducts(data.totalProducts);
       })
-      .catch(error => {
-        console.error('Error:', error);
-      });
-  }, [currentPage]); // Dependency array includes currentPage
+      .catch(error => console.error('Error:', error));
+  }, [currentPage]);
+  
+  // Calculate the total number of pages
+  const totalPages = Math.ceil(totalProducts / productsPerPage);
   
 
   const handleNextPage = () => {
@@ -45,8 +42,8 @@ function Catalog() {
   
       <div>
         <button onClick={handlePreviousPage} disabled={currentPage === 1}>Previous</button>
-        <span>Page {currentPage}</span>
-        <button onClick={handleNextPage}>Next</button> {/* Add logic to disable when on last page */}
+        <span>Page {currentPage} of {totalPages}</span>
+        <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
       </div>
     </div>
   );
