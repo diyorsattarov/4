@@ -5,6 +5,7 @@
 websocket_session::websocket_session(tcp::socket&& socket, boost::shared_ptr<shared_state> const& state)
     : ws_(std::move(socket)), state_(state) {
     initialize_product_data();
+    initialize_user_data();
 }
 
 // Destructor
@@ -22,6 +23,12 @@ void websocket_session::initialize_product_data() {
 
     // Update the total number of products
     totalProducts = product_data.size();
+}
+
+void websocket_session::initialize_user_data() {
+    user_data["admin"] = "password";
+    user_data["user"] = "password";
+    // Update the total number of users
 }
 
 // Handle failure
@@ -56,7 +63,10 @@ void websocket_session::on_read(beast::error_code ec, std::size_t bytes_transfer
                 handle_get_all_products(json_msg);
             } else if (method == "get_product") {
                 handle_get_product(json_msg);
-            } else {
+            } else if (method == "login") {
+                handle_login(json_msg);
+            } 
+            else {
                 std::string error_msg = "ERROR: Invalid method";
                 state_->send(error_msg);
                 std::cout << "Sent error response for invalid method." << std::endl;
@@ -146,5 +156,24 @@ void websocket_session::handle_get_product(const nlohmann::json& json_msg) {
         std::string error_msg = "ERROR: Missing 'product_id' parameter";
         state_->send(error_msg);
         std::cout << "Sent error response for missing 'product_id' parameter." << std::endl;
+    }
+}
+
+void websocket_session::handle_login(const nlohmann::json& json_msg) {
+    std::string username = json_msg.value("username", "");
+    std::string password = json_msg.value("password", "");
+
+    // Check if user exists and password matches
+    auto user_it = user_data.find(username);
+    bool is_valid = (user_it != user_data.end() && user_it->second == password);
+
+    if (is_valid) {
+        // Send a success message
+        nlohmann::json response = {{"status", "success"}, {"message", "Login successful"}};
+        state_->send(response.dump());
+    } else {
+        // Send an error message
+        nlohmann::json response = {{"status", "error"}, {"message", "Invalid username or password"}};
+        state_->send(response.dump());
     }
 }

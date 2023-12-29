@@ -27,6 +27,7 @@ class websocket_session : public boost::enable_shared_from_this<websocket_sessio
     void on_read(beast::error_code ec, std::size_t bytes_transferred);
     void on_write(beast::error_code ec, std::size_t bytes_transferred);
     void initialize_product_data();
+    void initialize_user_data();
 public:
     websocket_session(
         tcp::socket&& socket,
@@ -44,6 +45,7 @@ public:
 
 private:
     std::unordered_map<std::string, std::string> product_data;
+    std::unordered_map<std::string, std::string> user_data;
     std::size_t totalProducts;
     void
     on_send(boost::shared_ptr<std::string const> const& ss);
@@ -51,6 +53,8 @@ private:
     handle_get_product(const nlohmann::json& json_msg);
     void
     handle_get_all_products(const nlohmann::json& json_msg);
+    void 
+    handle_login(const nlohmann::json& json_msg);
 };
 
 template<class Body, class Allocator>
