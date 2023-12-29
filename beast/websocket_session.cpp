@@ -65,8 +65,7 @@ void websocket_session::on_read(beast::error_code ec, std::size_t bytes_transfer
                 handle_get_product(json_msg);
             } else if (method == "login") {
                 handle_login(json_msg);
-            } 
-            else {
+            } else {
                 std::string error_msg = "ERROR: Invalid method";
                 state_->send(error_msg);
                 std::cout << "Sent error response for invalid method." << std::endl;
