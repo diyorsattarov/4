@@ -13,19 +13,6 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
-
-// Serve the static index.jade file at the root URL ("/")
-app.get('/', async (req, res) => {
-  try {
-    // You can render the 'index' template (index.jade) here
-    res.render('index');
-  } catch (error) {
-    console.error('Error:', error);
-    res.status(500).send('Internal Server Error');
-  }
-});
 
 // WebSocket connection to 'ws://beast:8080/'
 const ws = new WebSocket('ws://beast:8080');
