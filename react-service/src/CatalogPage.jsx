@@ -35,14 +35,20 @@ function Catalog() {
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
       <h1>Product Catalog</h1>
       {products.map((product, index) => (
-        <div key={index} style={{ border: '1px solid black', margin: '10px', padding: '20px', width: '300px' }}>
-          <img src={staticImageUrl} alt="Product" style={{ width: '100%', height: 'auto' }} />
-          <h2>{product.name}</h2>
-          <p><strong>ID:</strong> {product.product_id}</p>
-          <p><strong>Description:</strong> {product.description}</p>
-        </div>
+      <div key={product.product_id} style={{ border: '1px solid black', margin: '10px', padding: '20px', width: '300px' }}>
+        {/* Use the product_id to generate the image URL */}
+        <img src={`product_${product.product_id}.png`} alt={`Product ${product.product_id}`} style={{ width: '100%', height: 'auto' }} />
+        <h2>{product.name}</h2>
+        <p><strong>ID:</strong> {product.product_id}</p>
+        <p><strong>Description:</strong> {product.description}</p>
+    </div>
       ))}
-      {/* Pagination Controls */}
+  
+      <div>
+        <button onClick={handlePreviousPage} disabled={currentPage === 1}>Previous</button>
+        <span>Page {currentPage} of {totalPages}</span>
+        <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
+      </div>
     </div>
   );
   
