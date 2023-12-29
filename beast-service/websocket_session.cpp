@@ -14,7 +14,7 @@ websocket_session::~websocket_session() {
 
 // Initialize product data
 void websocket_session::initialize_product_data() {
-    for (int i = 1; i <= 10; ++i) {
+    for (int i = 1; i <= 25; ++i) {
         std::string id = std::to_string(i);
         std::string product_json = "{\"product_id\": " + id + ", \"name\": \"Product " + id + "\", \"description\": \"Description of Product " + id + "\"}";
         product_data[id] = product_json;
