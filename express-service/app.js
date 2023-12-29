@@ -31,24 +31,26 @@ ws.on('open', () => {
 
 app.post('/submit-data', async (req, res) => {
   try {
-    // You can access the JSON data from the request body
     const jsonData = req.body;
-
-    // Log the contents of the JSON message
     console.log('Received JSON data:', jsonData);
 
-    // Check if there is a "method" property in the JSON data
+    // Check if the method is 'get_product' and if 'product_id' is provided
     if (jsonData.method === "get_product" && jsonData.product_id) {
-      // Send the JSON request as a WebSocket message to 'ws://localhost:8080/'
       ws.send(JSON.stringify(jsonData));
-      
-      // Listen for a response from the WebSocket server
-      ws.once('message', (response) => {
-        // Parse the response from the WebSocket server
-        const responseData = JSON.parse(response);
-        console.log(`beast-service responseData: ${JSON.stringify(responseData)}`);
 
-        // Send the response from the WebSocket server as the HTTP response
+      ws.once('message', (response) => {
+        const responseData = JSON.parse(response);
+        //console.log(`beast-service responseData: ${JSON.stringify(responseData)}`);
+        res.status(200).json(responseData);
+      });
+    }
+    // Check if the method is 'get_all_products'
+    else if (jsonData.method === "get_all_products") {
+      ws.send(JSON.stringify(jsonData));
+
+      ws.once('message', (response) => {
+        const responseData = JSON.parse(response);
+        //console.log(`beast-service responseData: ${JSON.stringify(responseData)}`);
         res.status(200).json(responseData);
       });
     } else {
@@ -60,6 +62,22 @@ app.post('/submit-data', async (req, res) => {
     res.status(500).send('Internal Server Error');
   }
 });
+
+app.post('/login-data', (req, res) => {
+  const { username, password } = req.body;
+
+  // Implement your login logic here.
+  // For this example, we'll just log the credentials and send a response.
+  console.log('Login Attempt:', username, password);
+  
+  // Dummy validation - in a real application, you should check the credentials against a database or another service
+  if (username === 'correctUsername' && password === 'correctPassword') {
+    res.json({ message: 'Login successful' });
+  } else {
+    res.status(401).json({ message: 'Invalid credentials' });
+  }
+});
+
 
 app.get('/get_product', async (req, res) => {
   try {
@@ -91,6 +109,32 @@ app.get('/get_product', async (req, res) => {
       console.log(`beast-service responseData: ${JSON.stringify(responseData)}`);
 
       // Send the response from the WebSocket server as the HTTP response
+      res.status(200).json(responseData);
+    });
+  } catch (error) {
+    console.error('Error:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+app.get('/get_all_products', async (req, res) => {
+  try {
+    // Extract the page number from query parameters
+    const page = parseInt(req.query.page) || 1; // Default to page 1 if not specified
+
+    // Create a JSON object for the 'get_all_products' method
+    const jsonData = { 
+      method: 'get_all_products',
+      page: page,
+      limit: 10  // Limit is always 10
+    };
+
+    // Send the JSON request as a WebSocket message to 'ws://beast:8080/'
+    ws.send(JSON.stringify(jsonData));
+
+    // Listen for a response from the WebSocket server
+    ws.once('message', (response) => {
+      const responseData = JSON.parse(response);
       res.status(200).json(responseData);
     });
   } catch (error) {

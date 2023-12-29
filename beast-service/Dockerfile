@@ -35,4 +35,4 @@ COPY . .
 RUN cmake . && make
 
 # Command to run the application
-CMD ["./beast-service", "0.0.0.0", "8080", ".", "4"]
+CMD ["./beast-service", "0.0.0.0", "8080", ".", "1"]
