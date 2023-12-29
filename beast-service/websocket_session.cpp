@@ -19,6 +19,9 @@ void websocket_session::initialize_product_data() {
         std::string product_json = "{\"product_id\": " + id + ", \"name\": \"Product " + id + "\", \"description\": \"Description of Product " + id + "\"}";
         product_data[id] = product_json;
     }
+
+    // Update the total number of products
+    totalProducts = product_data.size();
 }
 
 // Handle failure
@@ -117,9 +120,13 @@ void websocket_session::handle_get_all_products(const nlohmann::json& json_msg) 
         }
     }
 
-    // Send the paginated list of products
-    state_->send(products_json.dump());
-    std::cout << "Sent response with products for page " << page << std::endl;
+    nlohmann::json response_json = {
+        {"products", products_json},
+        {"totalProducts", totalProducts}
+    };
+
+    state_->send(response_json.dump());
+    std::cout << "Sent response with all products." << std::endl;
 }
 
 

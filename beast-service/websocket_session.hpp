@@ -44,6 +44,7 @@ public:
 
 private:
     std::unordered_map<std::string, std::string> product_data;
+    std::size_t totalProducts;
     void
     on_send(boost::shared_ptr<std::string const> const& ss);
     void
