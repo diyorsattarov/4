@@ -105,7 +105,9 @@ void websocket_session::on_read(beast::error_code ec, std::size_t bytes_transfer
         nlohmann::json json_msg = nlohmann::json::parse(received_msg);
         if (json_msg.contains("method")) {
             std::string method = json_msg["method"];
-            if (method == "get_all_products") {
+            if (method == "cart-api") {
+                handle_cart_api(json_msg);
+            } else if (method == "get_all_products") {
                 handle_get_all_products(json_msg);
             } else if (method == "get_product") {
                 handle_get_product(json_msg);
@@ -266,4 +268,56 @@ void websocket_session::handle_validate_cookie(const nlohmann::json& json_msg) {
         {"message", "Invalid cookie or cookie expired"}
     };
     state_->send(response.dump());
+}
+
+void websocket_session::handle_cart_api(const nlohmann::json& json_msg) {
+    std::string username = json_msg.value("username", "");
+    std::string action = json_msg.value("action", ""); // "add", "remove", "clear"
+
+    if (username.empty() || action.empty()) {
+        // Handle error: missing username or action
+        return;
+    }
+
+    if (action == "add") {
+        // Assuming product info is directly under the 'product' field in json_msg
+        nlohmann::json product_json = json_msg["product"];
+        ProductInfo product;
+        product.product_id = product_json.value("product_id", "");
+        product.name = product_json.value("name", "");
+        product.description = product_json.value("description", "");
+
+        // Add product to user's cart
+        user_carts[username].push_back(product);
+    } else if (action == "remove") {
+        std::string product_id = json_msg.value("product_id", "");
+        // Remove product from user's cart
+        // Implement logic to find and remove the product
+    } else if (action == "clear") {
+        user_carts[username].clear();
+    } else if (action == "get") {
+        // Fetch the user's cart
+        const std::vector<ProductInfo>& cart = user_carts[username];
+
+        // Create a JSON array to hold the cart items
+        nlohmann::json cart_json = nlohmann::json::array();
+        for (const auto& item : cart) {
+            nlohmann::json item_json;
+            item_json["product_id"] = item.product_id;
+            item_json["name"] = item.name;
+            item_json["description"] = item.description;
+            // Add any other relevant fields here
+            cart_json.push_back(item_json);
+        }
+
+        // Send the cart as a JSON response
+        nlohmann::json response = {
+            {"status", "success"},
+            {"username", username},
+            {"cart", cart_json}
+        };
+        state_->send(response.dump());
+    }
+
+    // Send response back to user
 }

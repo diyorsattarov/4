@@ -18,6 +18,13 @@ struct UserInfo {
     std::chrono::time_point<std::chrono::system_clock> token_expiry;
 };
 
+struct ProductInfo {
+    std::string product_id;
+    std::string name;
+    std::string description;
+    // ... other fields ...
+};
+
 // Forward declaration
 class shared_state;
 
@@ -55,6 +62,7 @@ private:
     std::unordered_map<std::string, std::string> product_data;
     std::unordered_map<std::string, UserInfo> user_data;
     std::unordered_map<std::string, UserInfo> user_sessions;
+    std::unordered_map<std::string, std::vector<ProductInfo>> user_carts;
     std::size_t totalProducts;
     void
     on_send(boost::shared_ptr<std::string const> const& ss);
@@ -66,6 +74,8 @@ private:
     handle_login(const nlohmann::json& json_msg);
     void
     handle_validate_cookie(const nlohmann::json& json_msg);
+    void
+    handle_cart_api(const nlohmann::json& json_msg);
 };
 
 template<class Body, class Allocator>

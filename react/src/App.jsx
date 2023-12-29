@@ -11,7 +11,6 @@ import CatalogPage from './routes/CatalogPage';
 
 function App() {
   const { isLoggedIn, username, handleLogin, handleLogout } = useSession();
-  const { cart, addToCart } = useCart(); // Use the useCart hook
 
   return (
     <Router>
@@ -24,7 +23,7 @@ function App() {
           <button className="logout-button" onClick={handleLogout}>Logout</button>
           <Routes>
             <Route path="/" exact element={<HomePage />} />
-            <Route path="/catalog/" element={<CatalogPage addToCart={addToCart} />} /> {/* Pass addToCart */}
+            <Route path="/catalog/" element={<CatalogPage/>} />
           </Routes>
         </div>
       )}
