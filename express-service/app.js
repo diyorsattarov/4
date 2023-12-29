@@ -63,6 +63,21 @@ app.post('/submit-data', async (req, res) => {
   }
 });
 
+app.post('/login-data', (req, res) => {
+  const { username, password } = req.body;
+
+  // Implement your login logic here.
+  // For this example, we'll just log the credentials and send a response.
+  console.log('Login Attempt:', username, password);
+  
+  // Dummy validation - in a real application, you should check the credentials against a database or another service
+  if (username === 'correctUsername' && password === 'correctPassword') {
+    res.json({ message: 'Login successful' });
+  } else {
+    res.status(401).json({ message: 'Invalid credentials' });
+  }
+});
+
 
 app.get('/get_product', async (req, res) => {
   try {
