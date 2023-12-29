@@ -1,8 +1,9 @@
 // HomePage.js
 import React from 'react';
 import useSession from '../hooks/session';
-import NavBar from '../components/NavBar'; // Adjust the import path as necessary
+import NavBar from '../components/NavBar';
 import LoginForm from '../components/LoginForm';
+import './HomePage.css'; // Import only if using a specific stylesheet for HomePage
 
 function HomePage() {
   const { isLoggedIn, username, handleLogin, handleLogout } = useSession();
@@ -15,12 +16,11 @@ function HomePage() {
         <div>
           <NavBar />
           <p>Welcome, {username}</p>
-          <button onClick={handleLogout}>Logout</button>
+          <button className="logout-button" onClick={handleLogout}>Logout</button>
         </div>
       )}
     </div>
   );
 }
-
 
 export default HomePage;

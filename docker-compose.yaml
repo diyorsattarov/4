@@ -10,10 +10,13 @@ services:
     build: ./react
     ports:
       - "5174:5174"
+    depends_on:
+      - express
 
   express:
     build: ./express
     ports:
       - "5000:5000"
-
+    depends_on:
+      - beast
 

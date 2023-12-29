@@ -1,0 +1,60 @@
+/* LoginForm.css */
+
+.login-form {
+    background-color: #f5f5f5; /* Light background */
+    padding: 2em;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 320px; /* Maximum width */
+    margin: auto; /* Center the form */
+    box-sizing: border-box; /* Ensure padding doesn't affect overall width */
+}
+
+.login-form label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-weight: 600;
+    text-align: left; /* Align label text to the left */
+}
+
+.login-form input {
+    width: calc(100% - 20px); /* Adjust width to account for padding */
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd; /* Light border */
+    border-radius: 4px;
+    font-size: 1em;
+    box-sizing: border-box; /* Ensure padding doesn't affect overall width */
+}
+
+.login-form input:focus {
+    outline: none;
+    border-color: #646cff;
+    box-shadow: 0 0 3px #646cff;
+}
+
+.login-form button {
+    width: calc(100% - 20px); /* Adjust width to account for padding */
+    padding: 10px;
+    background-color: #646cff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 1em;
+    font-weight: 600;
+    transition: background-color 0.25s;
+    box-sizing: border-box; /* Ensure padding doesn't affect overall width */
+}
+
+.login-form button:hover {
+    background-color: #535bf2;
+}
+
+.login-form button:focus {
+    outline: none;
+}
+
+/* No adjustments for dark theme, keeping it light only */

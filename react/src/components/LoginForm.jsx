@@ -1,5 +1,6 @@
 // LoginForm.jsx
 import React, { useState } from 'react';
+import './LoginForm.css'; // Import the CSS file
 
 const LoginForm = ({ onLogin }) => {
   const [username, setUsername] = useState('');
@@ -11,7 +12,7 @@ const LoginForm = ({ onLogin }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="login-form" onSubmit={handleSubmit}>
       <div>
         <label htmlFor="username">Username:</label>
         <input
