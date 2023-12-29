@@ -1,6 +1,6 @@
 #ifndef BOOST_BEAST_EXAMPLE_WEBSOCKET_CHAT_MULTI_WEBSOCKET_SESSION_HPP
 #define BOOST_BEAST_EXAMPLE_WEBSOCKET_CHAT_MULTI_WEBSOCKET_SESSION_HPP
-
+#include "json.hpp"
 #include "net.hpp"
 #include "beast.hpp"
 #include "shared_state.hpp"
@@ -46,6 +46,10 @@ private:
     std::unordered_map<std::string, std::string> product_data;
     void
     on_send(boost::shared_ptr<std::string const> const& ss);
+    void
+    handle_get_product(const nlohmann::json& json_msg);
+    void
+    handle_get_all_products(const nlohmann::json& json_msg);
 };
 
 template<class Body, class Allocator>
