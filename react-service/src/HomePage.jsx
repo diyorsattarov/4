@@ -9,6 +9,7 @@ function HomePage() {
       <ul>
         <li><Link to="/form-page">Go to Form Page</Link></li>
         <li><Link to="/product">Go to Product Page</Link></li>
+        <li><Link to="/catalog">Go to Catalog Page</Link></li>
       </ul>
     </div>
   );
