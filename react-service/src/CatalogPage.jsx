@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+const staticImageUrl = 'product.png';
+
 function Catalog() {
   const [products, setProducts] = useState([]);
   const [totalProducts, setTotalProducts] = useState(0);
@@ -34,17 +36,13 @@ function Catalog() {
       <h1>Product Catalog</h1>
       {products.map((product, index) => (
         <div key={index} style={{ border: '1px solid black', margin: '10px', padding: '20px', width: '300px' }}>
+          <img src={staticImageUrl} alt="Product" style={{ width: '100%', height: 'auto' }} />
           <h2>{product.name}</h2>
           <p><strong>ID:</strong> {product.product_id}</p>
           <p><strong>Description:</strong> {product.description}</p>
         </div>
       ))}
-  
-      <div>
-        <button onClick={handlePreviousPage} disabled={currentPage === 1}>Previous</button>
-        <span>Page {currentPage} of {totalPages}</span>
-        <button onClick={handleNextPage} disabled={currentPage === totalPages}>Next</button>
-      </div>
+      {/* Pagination Controls */}
     </div>
   );
   
