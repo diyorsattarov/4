@@ -1,23 +1,11 @@
-// Assuming this is CatalogPage.js
+// CatalogPage.js
 import React from 'react';
-import useSession from '../hooks/session';
-import NavBar from '../components/NavBar'; // Adjust the import path as necessary
-import LoginForm from '../components/LoginForm';
-import Catalog from '../components/Catalog'; // Import the Catalog component
+import Catalog from '../components/Catalog'; // Adjust the import path as necessary
 
 function CatalogPage() {
-  const { isLoggedIn, handleLogin } = useSession();
-
   return (
     <div>
-      {!isLoggedIn ? (
-        <LoginForm onLogin={handleLogin} />
-      ) : (
-        <div>
-          <NavBar />
-          <Catalog /> {/* Render the imported Catalog component */}
-        </div>
-      )}
+      <Catalog /> {/* Render the Catalog component */}
     </div>
   );
 }
