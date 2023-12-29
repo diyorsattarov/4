@@ -40,7 +40,7 @@ app.post('/submit-data', async (req, res) => {
 
       ws.once('message', (response) => {
         const responseData = JSON.parse(response);
-        console.log(`beast-service responseData: ${JSON.stringify(responseData)}`);
+        //console.log(`beast-service responseData: ${JSON.stringify(responseData)}`);
         res.status(200).json(responseData);
       });
     }
@@ -50,7 +50,7 @@ app.post('/submit-data', async (req, res) => {
 
       ws.once('message', (response) => {
         const responseData = JSON.parse(response);
-        console.log(`beast-service responseData: ${JSON.stringify(responseData)}`);
+        //console.log(`beast-service responseData: ${JSON.stringify(responseData)}`);
         res.status(200).json(responseData);
       });
     } else {
@@ -117,7 +117,7 @@ app.get('/get_all_products', async (req, res) => {
     ws.once('message', (response) => {
       // Parse the response from the WebSocket server
       const responseData = JSON.parse(response);
-      console.log(`beast-service responseData: ${JSON.stringify(responseData)}`);
+      //console.log(`beast-service responseData: ${JSON.stringify(responseData)}`);
 
       // Send the response from the WebSocket server as the HTTP response
       res.status(200).json(responseData);
