@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y \
     g++ \
     wget \
     libssl-dev \
-    libasio-dev 
+    libasio-dev
 
 # Set the Boost version
 ARG BOOST_VERSION=1.75.0
